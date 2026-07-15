@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  resetPassword,
-  confirmResetPassword,
-} from "../lib/auth/auth-service";
+import { Input, PasswordInput, Button } from "../components/ui";
+import { resetPassword, confirmResetPassword } from "../lib/auth/auth-service";
 
 type Step = "request" | "confirm";
 
@@ -20,14 +18,11 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await resetPassword(email);
       setStep("confirm");
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Failed to send reset code.";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Failed to send reset code.");
     } finally {
       setLoading(false);
     }
@@ -37,105 +32,76 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await confirmResetPassword(email, code, newPassword);
-      navigate("/login", { replace: true, state: { passwordReset: true } });
+      navigate("/login", { replace: true });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Password reset failed.";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Password reset failed.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="max-w-sm mx-auto py-16">
-      <h1 className="text-2xl font-bold mb-2">Reset password</h1>
-      <p className="text-gray-400 text-sm mb-8">
+    <div className="max-w-[360px] mx-auto py-16">
+      <h1 className="text-[28px] font-semibold text-center mb-1">Reset password</h1>
+      <p className="text-[14px] text-ink-muted dark:text-on-dark-muted text-center mb-8">
         {step === "request"
-          ? "Enter your email to receive a password reset code."
+          ? "Enter your email to receive a reset code."
           : "Enter the code and your new password."}
       </p>
 
       {error && (
-        <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <div className="mb-5 p-4 rounded-md bg-error/8 border border-error/20 text-[14px] text-error">
           {error}
         </div>
       )}
 
       {step === "request" ? (
         <form className="space-y-4" onSubmit={handleRequestCode}>
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-              placeholder="you@example.com"
-              required
-              autoComplete="email"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full h-11 rounded-xl font-semibold text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0"
-          >
-            {loading ? "Sending…" : "Send reset code"}
-          </button>
+          <Input
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            required
+            autoComplete="email"
+          />
+          <Button type="submit" loading={loading} className="w-full">
+            Send reset code
+          </Button>
         </form>
       ) : (
         <form className="space-y-4" onSubmit={handleConfirmReset}>
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">
-              Reset code
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition text-center tracking-widest text-lg"
-              placeholder="000000"
-              maxLength={6}
-              required
-              autoComplete="one-time-code"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">
-              New password
-            </label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-              placeholder="8+ characters"
-              required
-              autoComplete="new-password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full h-11 rounded-xl font-semibold text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0"
-          >
-            {loading ? "Resetting…" : "Reset password"}
-          </button>
+          <Input
+            label="Reset code"
+            type="text"
+            inputMode="numeric"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="000000"
+            maxLength={6}
+            required
+            autoComplete="one-time-code"
+            className="text-center tracking-[0.3em] text-[20px]"
+          />
+          <PasswordInput
+            label="New password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="8+ characters"
+            required
+            autoComplete="new-password"
+          />
+          <Button type="submit" loading={loading} className="w-full">
+            Reset password
+          </Button>
         </form>
       )}
 
-      <p className="mt-6 text-sm text-gray-400">
-        <Link to="/login" className="text-indigo-400 hover:underline">
+      <p className="mt-6 text-[14px] text-ink-muted dark:text-on-dark-muted text-center">
+        <Link to="/login" className="text-accent dark:text-accent-dark hover:underline">
           Back to sign in
         </Link>
       </p>

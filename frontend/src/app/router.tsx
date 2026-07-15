@@ -22,10 +22,10 @@ export default function AppRouter() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/cards" element={<CardInboxPage />} />
 
           {/* Authenticated */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/cards" element={<CardInboxPage />} />
             <Route path="/cards/:cardId" element={<CardDetailPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>

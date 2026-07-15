@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Input, PasswordInput, Button } from "../components/ui";
 import { signIn } from "../lib/auth/auth-service";
 
 export default function LoginPage() {
@@ -35,67 +36,58 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-sm mx-auto py-16">
-      <h1 className="text-2xl font-bold mb-2">Sign in</h1>
-      <p className="text-gray-400 text-sm mb-8">
+    <div className="max-w-[360px] mx-auto py-16">
+      <h1 className="text-[28px] font-semibold text-center mb-1">Sign in</h1>
+      <p className="text-[14px] text-ink-muted dark:text-on-dark-muted text-center mb-8">
         Enter your email and password to continue.
       </p>
 
       {error && (
-        <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          {error}
+        <div className="mb-5 p-4 rounded-md bg-error/8 border border-error/20 text-[14px] text-error">
+          <p>{error}</p>
+          <p className="mt-2 text-ink-faint dark:text-on-dark-muted text-[13px]">
+            Need help?{" "}
+            <a href="mailto:gusals0908@gmail.com" className="text-accent dark:text-accent-dark hover:underline">
+              gusals0908@gmail.com
+            </a>
+          </p>
         </div>
       )}
 
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1.5">
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-            placeholder="you@example.com"
-            required
-            autoComplete="email"
-          />
-        </div>
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          required
+          autoComplete="email"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1.5">
-            Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-            placeholder="••••••••"
-            required
-            autoComplete="current-password"
-          />
-        </div>
+        <PasswordInput
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          required
+          autoComplete="current-password"
+        />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full h-11 rounded-xl font-semibold text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0"
-        >
-          {loading ? "Signing in…" : "Sign in"}
-        </button>
+        <Button type="submit" loading={loading} className="w-full">
+          Sign in
+        </Button>
       </form>
 
-      <div className="mt-6 text-sm text-gray-400 space-y-2">
+      <div className="mt-6 text-[14px] text-center space-y-2">
         <p>
-          <Link to="/reset-password" className="text-indigo-400 hover:underline">
+          <Link to="/reset-password" className="text-accent dark:text-accent-dark hover:underline">
             Forgot password?
           </Link>
         </p>
-        <p>
+        <p className="text-ink-muted dark:text-on-dark-muted">
           Don't have an account?{" "}
-          <Link to="/signup" className="text-indigo-400 hover:underline">
+          <Link to="/signup" className="text-accent dark:text-accent-dark hover:underline">
             Sign up
           </Link>
         </p>

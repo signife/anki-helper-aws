@@ -15,18 +15,15 @@ export default function BatchActions({ totalReady, onAddSelected }: BatchActions
   if (count === 0) return null;
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5">
-      <span className="text-sm text-gray-300">
+    <div className="flex items-center gap-3 p-3 mb-3 rounded-md border border-accent/20 bg-accent/5 dark:bg-accent-dark/5">
+      <span className="text-[13px] text-ink-muted dark:text-on-dark-muted">
         {count} / {totalReady} selected
       </span>
-
       <div className="flex-1" />
-
-      <Button variant="secondary" onClick={clearSelection} disabled={isProcessing}>
+      <Button variant="secondary" size="sm" onClick={clearSelection} disabled={isProcessing}>
         {t("cancel")}
       </Button>
-
-      <Button onClick={onAddSelected} loading={isProcessing}>
+      <Button size="sm" onClick={onAddSelected} loading={isProcessing}>
         {t("addSelected")}
       </Button>
     </div>

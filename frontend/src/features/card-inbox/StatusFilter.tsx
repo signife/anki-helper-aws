@@ -20,15 +20,15 @@ export default function StatusFilter({ value, onChange }: StatusFilterProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-wrap gap-1">
       {filters.map((f) => (
         <button
           key={f.value}
           onClick={() => onChange(f.value)}
-          className={`px-3 py-1.5 text-sm rounded-lg border transition ${
+          className={`px-3 py-1.5 text-[12px] font-medium rounded-pill transition-colors ${
             value === f.value
-              ? "border-indigo-500/50 bg-indigo-500/15 text-indigo-300"
-              : "border-white/10 bg-white/5 text-gray-400 hover:bg-white/10"
+              ? "bg-accent text-white dark:bg-accent-dark"
+              : "bg-canvas-alt dark:bg-dark-surface-2 text-ink-muted dark:text-on-dark-muted hover:text-ink dark:hover:text-on-dark"
           }`}
         >
           {t(f.labelKey)}

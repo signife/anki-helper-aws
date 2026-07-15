@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../components/ui";
 import { AnkiSettingsPanel, ConnectionTestPanel, AnkiSetupPanel } from "../features/anki";
 import { apiClient } from "../lib/api/api-client";
-import i18n from "../lib/i18n";
 
 interface UserSettings {
   cardMode: "jp-jp" | "jp-native";
@@ -28,47 +27,30 @@ const DEFAULT_SETTINGS: UserSettings = {
 export default function SettingsPage() {
   const { t } = useTranslation();
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
-  const [language, setLanguage] = useState(i18n.language);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // 설정 로드
   useEffect(() => {
     async function load() {
       try {
         const res = await apiClient.get<{ settings: UserSettings }>("/settings");
         setSettings(res.settings);
-      } catch {
-        // API 미연결 시 로컬 기본값 사용
-      } finally {
-        setLoading(false);
-      }
+      } catch { /* use defaults */ }
+      finally { setLoading(false); }
     }
     load();
   }, []);
 
-  // 설정 저장
   async function handleSave() {
     setSaving(true);
     setSaved(false);
-
     try {
       await apiClient.patch("/settings", settings);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    } catch {
-      // TODO: 에러 표시
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  // 언어 변경
-  function handleLanguageChange(lang: string) {
-    setLanguage(lang);
-    i18n.changeLanguage(lang);
-    localStorage.setItem("anki-helper-language", lang);
+    } catch { /* TODO */ }
+    finally { setSaving(false); }
   }
 
   function update<K extends keyof UserSettings>(key: K, value: UserSettings[K]) {
@@ -78,93 +60,50 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <section className="space-y-8 max-w-2xl">
-      <h1 className="text-2xl font-bold">{t("settings")}</h1>
-
-      {/* Language */}
-      <fieldset className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-4">
-        <legend className="text-sm font-semibold text-gray-300 px-2">Language</legend>
-        <select
-          value={language}
-          onChange={(e) => handleLanguageChange(e.target.value)}
-          className="h-10 px-3 rounded-lg bg-gray-900 border border-white/10 text-white text-sm"
-        >
-          <option value="en">English</option>
-          <option value="ko">한국어</option>
-          <option value="ja">日本語</option>
-          <option value="zh">中文</option>
-        </select>
-      </fieldset>
+    <section className="space-y-8 max-w-[600px]">
+      <h1 className="text-[28px] font-semibold">{t("settings")}</h1>
 
       {/* Card Generation */}
-      <fieldset className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-4">
-        <legend className="text-sm font-semibold text-gray-300 px-2">
-          {t("cardGeneration")}
-        </legend>
-
+      <SettingsCard title={t("cardGeneration")}>
         <Row label={t("cardMode")}>
-          <select
-            value={settings.cardMode}
-            onChange={(e) => update("cardMode", e.target.value as "jp-jp" | "jp-native")}
-            className="h-10 px-3 rounded-lg bg-gray-900 border border-white/10 text-white text-sm"
-          >
+          <Select value={settings.cardMode} onChange={(v) => update("cardMode", v as "jp-jp" | "jp-native")}>
             <option value="jp-jp">{t("cardModeJpJp")}</option>
             <option value="jp-native">{t("cardModeJpNative")}</option>
-          </select>
+          </Select>
         </Row>
-
         <Row label={t("nativeLanguage")}>
-          <select
-            value={settings.nativeLanguage}
-            onChange={(e) => update("nativeLanguage", e.target.value)}
-            className="h-10 px-3 rounded-lg bg-gray-900 border border-white/10 text-white text-sm"
-          >
+          <Select value={settings.nativeLanguage} onChange={(v) => update("nativeLanguage", v)}>
             <option value="ko">한국어</option>
             <option value="en">English</option>
-            <option value="zh">中文</option>
-          </select>
+          </Select>
         </Row>
-
         <Row label={t("cardFont")}>
-          <select
-            value={settings.cardFont}
-            onChange={(e) => update("cardFont", e.target.value)}
-            className="h-10 px-3 rounded-lg bg-gray-900 border border-white/10 text-white text-sm"
-          >
+          <Select value={settings.cardFont} onChange={(v) => update("cardFont", v)}>
             <option value="ms-mincho">MS Mincho</option>
             <option value="yu-mincho">Yu Mincho</option>
             <option value="meiryo">Meiryo</option>
             <option value="malgun-gothic">Malgun Gothic</option>
             <option value="segoe-ui">Segoe UI</option>
-          </select>
+          </Select>
         </Row>
-      </fieldset>
+      </SettingsCard>
 
       {/* Audio */}
-      <fieldset className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-4">
-        <legend className="text-sm font-semibold text-gray-300 px-2">
-          {t("audio")}
-        </legend>
-
+      <SettingsCard title={t("audio")}>
         <Row label={t("pollyVoice")}>
-          <select
-            value={settings.pollyVoiceId}
-            onChange={(e) => update("pollyVoiceId", e.target.value)}
-            className="h-10 px-3 rounded-lg bg-gray-900 border border-white/10 text-white text-sm"
-          >
+          <Select value={settings.pollyVoiceId} onChange={(v) => update("pollyVoiceId", v)}>
             <option value="Kazuha">Kazuha (Neural)</option>
             <option value="Tomoko">Tomoko (Neural)</option>
             <option value="Takumi">Takumi (Standard)</option>
             <option value="Mizuki">Mizuki (Standard)</option>
-          </select>
+          </Select>
         </Row>
-
         <Row label={t("speechSpeed")}>
           <input
             type="number"
@@ -173,38 +112,26 @@ export default function SettingsPage() {
             step={0.05}
             min={0.5}
             max={2.0}
-            className="h-10 w-24 px-3 rounded-lg bg-gray-900 border border-white/10 text-white text-sm"
+            className="h-[34px] w-20 px-3 rounded-sm border border-hairline dark:border-hairline-dark bg-canvas dark:bg-dark-surface text-[14px] text-ink dark:text-on-dark outline-none focus:border-accent"
           />
         </Row>
-
         <Row label={t("generateWordAudio")}>
-          <input
-            type="checkbox"
-            checked={settings.generateWordAudio}
-            onChange={(e) => update("generateWordAudio", e.target.checked)}
-            className="w-5 h-5 accent-indigo-500"
-          />
+          <Toggle checked={settings.generateWordAudio} onChange={(v) => update("generateWordAudio", v)} />
         </Row>
-
         <Row label={t("generateExampleAudio")}>
-          <input
-            type="checkbox"
-            checked={settings.generateExampleAudio}
-            onChange={(e) => update("generateExampleAudio", e.target.checked)}
-            className="w-5 h-5 accent-indigo-500"
-          />
+          <Toggle checked={settings.generateExampleAudio} onChange={(v) => update("generateExampleAudio", v)} />
         </Row>
-      </fieldset>
+      </SettingsCard>
 
-      {/* Save button */}
+      {/* Save */}
       <div className="flex items-center gap-3">
-        <Button onClick={handleSave} loading={saving}>
-          💾 {t("saveSettings")}
+        <Button onClick={handleSave} loading={saving} size="sm">
+          {t("saveSettings")}
         </Button>
-        {saved && <span className="text-sm text-emerald-400">{t("settingsSaved")}</span>}
+        {saved && <span className="text-[13px] text-success">{t("settingsSaved")}</span>}
       </div>
 
-      {/* Anki Panels */}
+      {/* Anki panels */}
       <AnkiSettingsPanel />
       <ConnectionTestPanel />
       <AnkiSetupPanel />
@@ -212,11 +139,52 @@ export default function SettingsPage() {
   );
 }
 
+function SettingsCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="p-5 rounded-lg border border-hairline dark:border-hairline-dark bg-canvas dark:bg-dark-surface space-y-4">
+      <h3 className="text-[14px] font-semibold text-ink dark:text-on-dark">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-      <span className="text-sm text-gray-400 sm:w-44 shrink-0">{label}</span>
-      <div className="flex-1">{children}</div>
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-[14px] text-ink-muted dark:text-on-dark-muted">{label}</span>
+      <div>{children}</div>
     </div>
+  );
+}
+
+function Select({ value, onChange, children }: { value: string; onChange: (v: string) => void; children: React.ReactNode }) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="h-[34px] px-3 rounded-sm border border-hairline dark:border-hairline-dark bg-canvas dark:bg-dark-surface text-[14px] text-ink dark:text-on-dark outline-none cursor-pointer focus:border-accent"
+    >
+      {children}
+    </select>
+  );
+}
+
+function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={`relative w-[42px] h-[26px] rounded-pill transition-colors ${
+        checked ? "bg-success" : "bg-hairline dark:bg-hairline-dark"
+      }`}
+    >
+      <span
+        className={`absolute top-[3px] left-[3px] w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+          checked ? "translate-x-4" : ""
+        }`}
+      />
+    </button>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Input, Button } from "../components/ui";
 import { confirmSignUp } from "../lib/auth/auth-service";
 
 export default function VerifyEmailPage() {
@@ -11,6 +12,7 @@ export default function VerifyEmailPage() {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,10 +21,7 @@ export default function VerifyEmailPage() {
 
     try {
       await confirmSignUp(email, code);
-      navigate("/login", {
-        replace: true,
-        state: { verified: true },
-      });
+      setSuccess(true);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Verification failed. Please try again.";
@@ -32,71 +31,78 @@ export default function VerifyEmailPage() {
     }
   }
 
+  if (success) {
+    return (
+      <div className="max-w-[360px] mx-auto py-16 text-center">
+        <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-success/10 grid place-items-center">
+          <svg className="w-7 h-7 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h1 className="text-[28px] font-semibold mb-2">Verified</h1>
+        <p className="text-[14px] text-ink-muted dark:text-on-dark-muted mb-8">
+          Your account has been verified. You can now sign in.
+        </p>
+        <Button onClick={() => navigate("/login", { replace: true })} className="w-full">
+          Go to Sign in
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-sm mx-auto py-16">
-      <h1 className="text-2xl font-bold mb-2">Verify your email</h1>
-      <p className="text-gray-400 text-sm mb-8">
-        We sent a verification code to{" "}
-        {email ? (
-          <span className="text-white font-medium">{email}</span>
-        ) : (
-          "your email"
-        )}
-        . Enter it below.
+    <div className="max-w-[360px] mx-auto py-16">
+      <h1 className="text-[28px] font-semibold text-center mb-1">Verify your email</h1>
+      <p className="text-[14px] text-ink-muted dark:text-on-dark-muted text-center mb-8">
+        We sent a code to{" "}
+        {email ? <span className="text-ink dark:text-on-dark font-medium">{email}</span> : "your email"}.
       </p>
 
       {error && (
-        <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          {error}
+        <div className="mb-5 p-4 rounded-md bg-error/8 border border-error/20 text-[14px] text-error">
+          <p>{error}</p>
+          <p className="mt-2 text-ink-faint dark:text-on-dark-muted text-[13px]">
+            Need help?{" "}
+            <a href="mailto:gusals0908@gmail.com" className="text-accent dark:text-accent-dark hover:underline">
+              gusals0908@gmail.com
+            </a>
+          </p>
         </div>
       )}
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         {!emailFromState && (
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
+          <Input
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            required
+          />
         )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1.5">
-            Verification code
-          </label>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition text-center tracking-widest text-lg"
-            placeholder="000000"
-            maxLength={6}
-            required
-            autoComplete="one-time-code"
-          />
-        </div>
+        <Input
+          label="Verification code"
+          type="text"
+          inputMode="numeric"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          placeholder="000000"
+          maxLength={6}
+          required
+          autoComplete="one-time-code"
+          className="text-center tracking-[0.3em] text-[20px]"
+        />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full h-11 rounded-xl font-semibold text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0"
-        >
-          {loading ? "Verifying…" : "Verify"}
-        </button>
+        <Button type="submit" loading={loading} disabled={!code || !email} className="w-full">
+          Verify
+        </Button>
       </form>
 
-      <p className="mt-6 text-sm text-gray-400">
+      <p className="mt-6 text-[14px] text-ink-muted dark:text-on-dark-muted text-center">
         Didn't receive the code?{" "}
-        <button className="text-indigo-400 hover:underline">Resend</button>
+        <button className="text-accent dark:text-accent-dark hover:underline">Resend</button>
       </p>
     </div>
   );

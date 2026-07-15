@@ -2,36 +2,60 @@ import { Link } from "react-router-dom";
 
 export default function HomePage() {
   return (
-    <section className="py-12">
-      <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 text-sm font-semibold">
-        ⚡ AI-powered Japanese vocabulary cards
-      </div>
-
-      <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight max-w-2xl">
+    <section className="py-16 text-center max-w-[680px] mx-auto">
+      <h1 className="text-[40px] sm:text-[56px] font-semibold tracking-[-0.03em] leading-[1.07] text-ink dark:text-on-dark">
         Save Japanese words
         <br />
-        as your personal dictionary cards.
+        as personal dictionary cards.
       </h1>
 
-      <p className="mt-5 text-gray-400 text-lg max-w-xl leading-relaxed">
-        Enter a Japanese word, get AI-generated card data with readings,
-        definitions, examples, and audio — then add it directly to Anki.
+      <p className="mt-5 text-[21px] font-normal leading-[1.38] text-ink-muted dark:text-on-dark-muted max-w-[520px] mx-auto">
+        Enter a word, get AI-generated readings, definitions, examples, and audio — then add directly to Anki.
       </p>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex justify-center gap-3 flex-wrap">
         <Link
-          to="/signup"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 transition-transform"
+          to="/cards"
+          className="h-[44px] px-6 inline-flex items-center rounded-pill text-[17px] font-normal text-white bg-accent hover:bg-accent-hover dark:bg-accent-dark active:scale-[0.97] transition-all"
         >
           Get started
         </Link>
         <Link
           to="/login"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+          className="h-[44px] px-6 inline-flex items-center rounded-pill text-[17px] font-normal text-accent dark:text-accent-dark border border-accent/30 dark:border-accent-dark/30 hover:bg-accent/5 dark:hover:bg-accent-dark/5 active:scale-[0.97] transition-all"
         >
           Sign in
         </Link>
       </div>
+
+      {/* Feature grid */}
+      <div className="mt-20 grid sm:grid-cols-3 gap-6 text-left">
+        <FeatureCard
+          emoji="🤖"
+          title="AI card generation"
+          description="Bedrock generates readings, definitions, expressions, examples, synonyms, and kanji data."
+        />
+        <FeatureCard
+          emoji="🔊"
+          title="Japanese audio"
+          description="Amazon Polly synthesizes natural word and sentence audio from hiragana readings."
+        />
+        <FeatureCard
+          emoji="📇"
+          title="Direct Anki import"
+          description="AnkiConnect adds cards with 18 fields, templates, and media to your local Anki."
+        />
+      </div>
     </section>
+  );
+}
+
+function FeatureCard({ emoji, title, description }: { emoji: string; title: string; description: string }) {
+  return (
+    <div className="p-5 rounded-lg border border-hairline dark:border-hairline-dark bg-canvas dark:bg-dark-surface">
+      <div className="text-2xl mb-2">{emoji}</div>
+      <h3 className="text-[14px] font-semibold mb-1">{title}</h3>
+      <p className="text-[14px] text-ink-muted dark:text-on-dark-muted leading-[1.43]">{description}</p>
+    </div>
   );
 }

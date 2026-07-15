@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Input, PasswordInput, Button } from "../components/ui";
 import { signUp } from "../lib/auth/auth-service";
 
 export default function SignupPage() {
@@ -10,6 +11,15 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const policies = [
+    { key: "length", label: "8 characters minimum", met: password.length >= 8 },
+    { key: "upper", label: "One uppercase letter", met: /[A-Z]/.test(password) },
+    { key: "lower", label: "One lowercase letter", met: /[a-z]/.test(password) },
+    { key: "number", label: "One number", met: /\d/.test(password) },
+  ];
+
+  const allPoliciesMet = policies.every((p) => p.met);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -19,11 +29,15 @@ export default function SignupPage() {
       return;
     }
 
+    if (!allPoliciesMet) {
+      setError("Password does not meet all requirements.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const result = await signUp(email, password);
-
       if (result.nextStep?.signUpStep === "CONFIRM_SIGN_UP") {
         navigate("/verify-email", { state: { email } });
       }
@@ -37,76 +51,77 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="max-w-sm mx-auto py-16">
-      <h1 className="text-2xl font-bold mb-2">Create account</h1>
-      <p className="text-gray-400 text-sm mb-8">
+    <div className="max-w-[360px] mx-auto py-16">
+      <h1 className="text-[28px] font-semibold text-center mb-1">Create account</h1>
+      <p className="text-[14px] text-ink-muted dark:text-on-dark-muted text-center mb-8">
         Sign up with your email to start creating cards.
       </p>
 
       {error && (
-        <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          {error}
+        <div className="mb-5 p-4 rounded-md bg-error/8 border border-error/20 text-[14px] text-error">
+          <p>{error}</p>
+          <p className="mt-2 text-ink-faint dark:text-on-dark-muted text-[13px]">
+            Need help?{" "}
+            <a href="mailto:gusals0908@gmail.com" className="text-accent dark:text-accent-dark hover:underline">
+              gusals0908@gmail.com
+            </a>
+          </p>
         </div>
       )}
 
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1.5">
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-            placeholder="you@example.com"
-            required
-            autoComplete="email"
-          />
-        </div>
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          required
+          autoComplete="email"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1.5">
-            Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-            placeholder="8+ characters"
-            required
-            autoComplete="new-password"
-          />
-        </div>
+        <PasswordInput
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="8+ characters"
+          required
+          autoComplete="new-password"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1.5">
-            Confirm password
-          </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/5 text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-            placeholder="••••••••"
-            required
-            autoComplete="new-password"
-          />
-        </div>
+        {/* Password policy */}
+        {password.length > 0 && (
+          <div className="p-3 rounded-md border border-hairline dark:border-hairline-dark bg-canvas-alt dark:bg-dark-surface space-y-1.5">
+            {policies.map((p) => (
+              <div key={p.key} className="flex items-center gap-2 text-[13px]">
+                <span className={p.met ? "text-success" : "text-ink-faint dark:text-on-dark-muted"}>
+                  {p.met ? "✓" : "○"}
+                </span>
+                <span className={p.met ? "text-ink dark:text-on-dark" : "text-ink-faint dark:text-on-dark-muted"}>
+                  {p.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full h-11 rounded-xl font-semibold text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0"
-        >
-          {loading ? "Creating account…" : "Create account"}
-        </button>
+        <PasswordInput
+          label="Confirm password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="••••••••"
+          required
+          autoComplete="new-password"
+        />
+
+        <Button type="submit" loading={loading} disabled={!allPoliciesMet || !email} className="w-full">
+          Create account
+        </Button>
       </form>
 
-      <p className="mt-6 text-sm text-gray-400">
+      <p className="mt-6 text-[14px] text-ink-muted dark:text-on-dark-muted text-center">
         Already have an account?{" "}
-        <Link to="/login" className="text-indigo-400 hover:underline">
+        <Link to="/login" className="text-accent dark:text-accent-dark hover:underline">
           Sign in
         </Link>
       </p>
