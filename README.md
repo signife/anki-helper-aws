@@ -3,7 +3,7 @@
 AI 기반 일본어 어휘 카드 생성 서비스. 단어를 입력하면 Amazon Bedrock이 카드 데이터를 생성하고, Amazon Polly가 음성을 합성하여, AnkiConnect를 통해 로컬 Anki에 저장한다.
 
 ## 프로젝트 구조
-https://d1mqc9eqoybz0l.cloudfront.net/cards
+https://d1mqc9eqoybz0l.cloudfront.net
 
 ```
 anki-helper/
